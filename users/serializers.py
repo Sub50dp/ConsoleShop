@@ -1,0 +1,31 @@
+from django.contrib.auth import get_user_model
+from phonenumber_field.serializerfields import PhoneNumberField
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
+
+class UserSerializer(serializers.ModelSerializer):
+    phone_number = PhoneNumberField(max_length=50, region="UA", required=True)
+    password = serializers.CharField(write_only=True, required=True)
+    password_2 = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'email', 'phone_number', 'full_name', 'nick_name', 'address', 'password', 'password_2',]
+        extra_kwargs = {
+                        'email': {'required': True},
+                        'full_name': {'required': True},
+                        }
+
+    def validate(self, data):
+        password = data.get('password')
+        password_2 = data.get('password_2')
+
+        if password and password_2 and password != password_2:
+            raise ValidationError("Passwords do not match")
+
+        return data
+
+    def create(self, validated_data):
+        validated_data.pop('password_2')  # Убираем password_2 перед сохранением
+        return super().create(validated_data)
