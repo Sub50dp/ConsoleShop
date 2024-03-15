@@ -11,16 +11,22 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from environ import Env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = Env()
+env_file_path = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_file_path):
+    env.read_env(env_file=env_file_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--$lay^12j1!kd!4y2p2+#(g_cr1ipg+qfg4^hp+zi0ta$^j_%8'
+SECRET_KEY = env.str('SECRET_KEY', default='django-insecure--$lay^12j1!kd!4y2p2+#(g_cr1ipg+qfg4^hp+zi0ta$^j_%8')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'shop',
+    'rest_framework',
+    'drf_yasg',
+    'users',
+
 ]
 
 MIDDLEWARE = [
@@ -74,13 +86,13 @@ WSGI_APPLICATION = 'Console.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "Console_db",
-        "USER": "Pg_Console",
-        "PASSWORD": "_eXWbGDfu1R=CW*1",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env.str('POSTGRES_DB', default='console_db'),
+        'USER': env.str('POSTGRES_USER', default='Pg_Console'),
+        'PASSWORD': env.str('POSTGRES_PASSWORD', default='_eXWbGDfu1R=CW*1'),
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
