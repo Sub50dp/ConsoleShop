@@ -27,5 +27,10 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('password_2')  # Убираем password_2 перед сохранением
+        validated_data.pop('password_2')  # Remove password_2 from validated_data
         return super().create(validated_data)
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
