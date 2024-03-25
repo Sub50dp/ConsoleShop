@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 from environ import Env
 
+from utils.database_conf import get_database_configuration
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -95,16 +97,7 @@ WSGI_APPLICATION = 'Console.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env.str('POSTGRES_DB', default='console_db'),
-        'USER': env.str('POSTGRES_USER', default='Pg_Console'),
-        'PASSWORD': env.str('POSTGRES_PASSWORD', default='_eXWbGDfu1R=CW*1'),
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+DATABASES = get_database_configuration(env)
 
 
 # Password validation
@@ -142,6 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
