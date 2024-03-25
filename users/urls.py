@@ -10,4 +10,5 @@ urlpatterns = [
     path('login/', views.UserLoginApiView.as_view(), name='login'),
     path('logout/', views.UserLogoutApiView.as_view(), name='logout'),
     path('delete/<int:pk>/', views.UserDeleteApiView.as_view(), name='delete'),
+    path('confirm-email/<str:token>/<str:token2>/', views.UserConfirmEmailApiView.as_view(), name='confirm_email'),
 ]
