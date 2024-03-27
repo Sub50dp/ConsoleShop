@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  console:
+    restart: always
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        PROJECT_DIR: ${PROJECT_DIR}
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - .:$PROJECT_DIR
+      - static_console:$PROJECT_DIR/static
+      - media_console:$PROJECT_DIR/media
+    command: >
+      sh -c "cd $PROJECT_DIR &&
+             python manage.py collectstatic --noinput &&
+             python manage.py migrate && 
+             python manage.py runserver 0.0.0.0:8000"
+
+  postgres:
+    container_name: postgres_container_console
+    image: postgres:15.5-alpine3.18
+    restart: always
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=50"
+      - "-c"
+      - "shared_buffers=1GB"
+      - "-c"
+      - "effective_cache_size=4GB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=512MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "temp_file_limit=10GB"
+      - "-c"
+      - "log_min_duration_statement=200ms"
+      - "-c"
+      - "idle_in_transaction_session_timeout=10s"
+      - "-c"
+      - "lock_timeout=1s"
+      - "-c"
+      - "statement_timeout=60s"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+      - "-c"
+      - "pg_stat_statements.max=10000"
+      - "-c"
+      - "pg_stat_statements.track=all"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - console-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+  pgadmin:
+    container_name: pgadmin_container_console
+    image: dpage/pgadmin4:8.0
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-console-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+
+volumes:
+  static_console:
+  media_console:
+  console-data:
+  pgadmin-console-data:
+
+networks:
+  postgres:
+    driver: bridge
