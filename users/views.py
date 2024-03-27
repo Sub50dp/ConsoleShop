@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, logout, authenticate, login
+from django.contrib.auth import get_user_model, logout, authenticate, login, update_session_auth_hash
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework.views import APIView
 
-from users.serializers import UserSerializer, LoginSerializer
+from users.serializers import UserSerializer, LoginSerializer, ChangePasswordSerializer
 from users.swagger_schemas import delete_user_response_schema
 from utils.email_confirmation import EmailConfirmationSender
 from utils.permissions import OwnOrAdminPermission, StuffOrAdminPermission
@@ -148,3 +148,20 @@ class UserDeleteApiView(APIView):
             status_code = status.HTTP_404_NOT_FOUND
 
         return Response({"message": message}, status=status_code)
+
+
+class ChangePasswordApiView(APIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if user.check_password(serializer.data.get('old_password')):
+                user.set_password(serializer.data.get('new_password'))
+                user.save()
+                update_session_auth_hash(request, user)  # To update session after password change
+                return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
+            return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

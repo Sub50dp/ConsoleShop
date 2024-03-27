@@ -12,8 +12,5 @@ urlpatterns = [
     path('logout/', views.UserLogoutApiView.as_view(), name='logout'),
     path('delete/<int:pk>/', views.UserDeleteApiView.as_view(), name='delete'),
     path('confirm-email/<str:token>/<str:token2>/', views.UserConfirmEmailApiView.as_view(), name='confirm_email'),
-    path('reset_password/', auth_views.PasswordResetView.as_view(), name='reset_password'),
-    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('change_password/', views.ChangePasswordApiView.as_view(), name='change_password'),
 ]
