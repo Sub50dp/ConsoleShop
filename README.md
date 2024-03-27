@@ -9,20 +9,10 @@
 
     `git clone <repository_URL>`.
 
-### **Install Poetry:**
-
-To install Poetry, you can use the [official Poetry installer](https://python-poetry.org/docs/#installing-with-the-official-installer). Follow the instructions provided in the official documentation.
-
-### **Install Project Dependencies:**
-
-   Run:
-
-   `poetry install`
-
 ### **Run the Project in Docker using docker-compose:**
 
 -   Make sure you have Docker and docker-compose installed.
--   Navigate to the directory containing the `docker-compose.yml` file.
+-   Navigate to the directory containing the `docker-compose.yml` file in your cmd.
 -   Execute:
 
     `docker-compose build`
