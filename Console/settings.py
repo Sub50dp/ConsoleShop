@@ -179,8 +179,8 @@ SOCIALACCOUNT_PROVIDERS = {
 EMAIL_HOST = env.str('EMAIL_HOST', default='smtp.ukr.net')
 EMAIL_PORT = env.str('EMAIL_PORT', default=465)
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='admin@ukr.net')
-EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='secret key')
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='daya26@ukr.net')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='FViRMhHKmCef7HzI')
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
