@@ -1,9 +1,7 @@
-from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 
 from users import views
-from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.UserListApiView.as_view(), name='users_list',),
@@ -13,4 +11,5 @@ urlpatterns = [
     path('delete/<int:pk>/', views.UserDeleteApiView.as_view(), name='delete'),
     path('confirm-email/<str:token>/<str:token2>/', views.UserConfirmEmailApiView.as_view(), name='confirm_email'),
     path('change_password/', views.ChangePasswordApiView.as_view(), name='change_password'),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 ]
