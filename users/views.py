@@ -4,15 +4,15 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status, filters, permissions
+from rest_framework import status, filters, permissions, mixins
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import CreateAPIView, ListAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, ListAPIView, get_object_or_404, UpdateAPIView, GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework.views import APIView
 
-from users.serializers import UserSerializer, LoginSerializer
+from users.serializers import UserSerializer, LoginSerializer, UserEditSerializer
 from users.swagger_schemas import delete_user_response_schema
 from utils.email_confirmation import EmailConfirmationSender
 from utils.permissions import OwnOrAdminPermission, StuffOrAdminPermission
@@ -146,5 +146,30 @@ class UserDeleteApiView(APIView):
         except get_user_model().DoesNotExist:
             message = "User not found"
             status_code = status.HTTP_404_NOT_FOUND
+
+        return Response({"message": message}, status=status_code)
+
+
+class UserEditApiView(mixins.UpdateModelMixin, GenericAPIView):
+
+    queryset = get_user_model().objects.all()
+    serializer_class = UserEditSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        partial = True
+        user = request.user
+        serializer = self.get_serializer(user, data=request.data, partial=partial)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
+            message = f"{field}: {message}"
+            status_code = status.HTTP_400_BAD_REQUEST
+        else:
+            self.perform_update(serializer)
+            message = "User details updated"
+            status_code = status.HTTP_200_OK
 
         return Response({"message": message}, status=status_code)

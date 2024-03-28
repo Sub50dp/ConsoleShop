@@ -11,4 +11,5 @@ urlpatterns = [
     path('logout/', views.UserLogoutApiView.as_view(), name='logout'),
     path('delete/<int:pk>/', views.UserDeleteApiView.as_view(), name='delete'),
     path('confirm-email/<str:token>/<str:token2>/', views.UserConfirmEmailApiView.as_view(), name='confirm_email'),
+    path('edit-profile/', views.UserEditApiView.as_view(), name='edit_profile'),
 ]

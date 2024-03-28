@@ -36,3 +36,11 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+    phone_number = PhoneNumberField(max_length=50, region="UA", required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'phone_number', 'full_name', 'nick_name', 'address', 'email',]
