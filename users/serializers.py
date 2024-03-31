@@ -40,7 +40,16 @@ class LoginSerializer(serializers.Serializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, validators=[validate_password])
+    confirm_password = serializers.CharField(required=True)
 
-class ResetPasswordEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+class ResetPasswordTokenSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)
+    token = serializers.CharField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request:
+            token = request.query_params.get('token')
+            self.fields['token'].initial = token

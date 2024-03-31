@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django_rest_passwordreset.views import ResetPasswordConfirm
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, filters, permissions
 from rest_framework.exceptions import ValidationError
@@ -11,8 +12,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 
-from users.serializers import UserSerializer, LoginSerializer, ChangePasswordSerializer
+from users.serializers import UserSerializer, LoginSerializer, ChangePasswordSerializer, ResetPasswordTokenSerializer
 from users.swagger_schemas import delete_user_response_schema
 from utils.email_confirmation import EmailConfirmationSender
 from utils.permissions import OwnOrAdminPermission, StuffOrAdminPermission
@@ -150,18 +152,44 @@ class UserDeleteApiView(APIView):
         return Response({"message": message}, status=status_code)
 
 
-class ChangePasswordApiView(APIView):
+class ChangePasswordApiView(GenericAPIView):
     serializer_class = ChangePasswordSerializer
     permission_classes = [permissions.IsAuthenticated]
-    def post(self, request, *args, **kwargs):
-        serializer = ChangePasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            if user.check_password(serializer.data.get('old_password')):
-                user.set_password(serializer.data.get('new_password'))
-                user.save()
-                update_session_auth_hash(request, user)  # To update session after password change
-                return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
-            return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, *args, **kwargs):
+
+        user = self.request.user
+        serializer = self.get_serializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_412_PRECONDITION_FAILED)
+
+        old_password = serializer.validated_data.get("old_password")
+        new_password = serializer.validated_data.get("new_password")
+        confirm_password = serializer.validated_data.get("confirm_password")
+
+        if new_password == old_password:
+            return Response(
+                {"message": "New password must be different from old password"},
+                status=status.HTTP_412_PRECONDITION_FAILED,
+            )
+
+        if not user.check_password(old_password):
+            return Response({"message": "Invalid old password"}, status=status.HTTP_412_PRECONDITION_FAILED)
+
+        if new_password != confirm_password:
+            return Response({"message": "Password mismatch"}, status=status.HTTP_412_PRECONDITION_FAILED)
+
+        user.set_password(new_password)
+        user.save()
+
+        logout(request)
+        response = Response({"message": "Password changed successfully. You can login now."}, status=status.HTTP_200_OK)
+
+        return response
+
+
+class CustomResetPasswordConfirm(ResetPasswordConfirm):
+    serializer_class = ResetPasswordTokenSerializer
+    def post(self, request, *args, **kwargs):
+        return super().post(request,*args, **kwargs)
