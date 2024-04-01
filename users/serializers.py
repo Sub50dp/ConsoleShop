@@ -43,6 +43,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True, validators=[validate_password])
     confirm_password = serializers.CharField(required=True)
 
+
 class ResetPasswordTokenSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
     token = serializers.CharField(required=True)
@@ -53,3 +54,11 @@ class ResetPasswordTokenSerializer(serializers.Serializer):
         if request:
             token = request.query_params.get('token')
             self.fields['token'].initial = token
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+    phone_number = PhoneNumberField(max_length=50, region="UA", required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'phone_number', 'full_name', 'nick_name', 'address', 'email',]
