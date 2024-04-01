@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, logout, authenticate, login, update_session_auth_hash
+from django.contrib.auth import get_user_model, logout, authenticate, login
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -7,15 +7,14 @@ from django_rest_passwordreset.views import ResetPasswordConfirm
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, filters, permissions, mixins
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import CreateAPIView, ListAPIView, get_object_or_404, UpdateAPIView, GenericAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, get_object_or_404, GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView
 
-from users.serializers import UserSerializer, LoginSerializer, UserEditSerializer
-from users.serializers import UserSerializer, LoginSerializer, ChangePasswordSerializer, ResetPasswordTokenSerializer
+from users.serializers import (UserSerializer, LoginSerializer, ChangePasswordSerializer,
+                               ResetPasswordTokenSerializer, UserEditSerializer)
 from users.swagger_schemas import delete_user_response_schema
 from utils.email_confirmation import EmailConfirmationSender
 from utils.permissions import OwnOrAdminPermission, StuffOrAdminPermission
@@ -63,7 +62,7 @@ class UserConfirmEmailApiView(APIView):
         try:
             uid = force_str(urlsafe_base64_decode(token))
             user = get_object_or_404(get_user_model(), pk=uid)
-        except Exception as e:
+        except Exception:
             return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
         if email_token_generator.check_token(user, token2):
@@ -105,7 +104,7 @@ class UserLoginApiView(CreateAPIView):
 
         try:
             user = authenticate(request, username=data["email"], password=data["password"])
-        except Exception as e:
+        except Exception:
             message = "An error occurred during authentication"
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         else:
@@ -192,8 +191,10 @@ class ChangePasswordApiView(GenericAPIView):
 
 class CustomResetPasswordConfirm(ResetPasswordConfirm):
     serializer_class = ResetPasswordTokenSerializer
+
     def post(self, request, *args, **kwargs):
-        return super().post(request,*args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
 
 class UserEditApiView(mixins.UpdateModelMixin, GenericAPIView):
 

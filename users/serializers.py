@@ -43,6 +43,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True, validators=[validate_password])
     confirm_password = serializers.CharField(required=True)
 
+
 class ResetPasswordTokenSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
     token = serializers.CharField(required=True)
