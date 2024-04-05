@@ -14,16 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
 from .yasg import urlpatterns as doc_urls
 
-prefix = "api"
+prefix = "console"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(f"{prefix}/users/", include("users.urls")),
     path('accounts/', include('allauth.urls')),
+    path(f"{prefix}/shop/", include("shop.urls")),
     *doc_urls,
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
