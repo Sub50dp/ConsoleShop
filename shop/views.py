@@ -1,8 +1,10 @@
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from shop.models import Category
 from shop.serializers import CategorySerializer
@@ -14,7 +16,6 @@ class CreateCategoryAPIView(CreateAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
     permission_classes = [StuffOrAdminPermission]
-
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -49,3 +50,16 @@ class ListCategoryAPIView(ListAPIView):
 
 class ShowCategoryAPIView(ListAPIView):
     pass
+
+
+class UserDeleteApiView(APIView):
+
+    permission_classes = [IsAuthenticated, StuffOrAdminPermission]
+    http_method_names = ["delete"]
+
+    def delete(self, request, pk, *args, **kwargs):
+        category = get_object_or_404(Category, pk=pk)
+        category.delete()
+        message = "Category deleted successfully"
+        status_code = status.HTTP_200_OK
+        return Response({"message": message}, status=status_code)
