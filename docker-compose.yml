@@ -20,8 +20,27 @@ services:
     command: >
       sh -c "cd $PROJECT_DIR &&
              python manage.py collectstatic --noinput &&
+             python manage.py makemigrations &&
              python manage.py migrate && 
-             python manage.py runserver 0.0.0.0:8000"
+             python manage.py runserver 0.0.0.0:8000
+             "                                        
+
+  console-nginx:
+    restart: always
+    build:
+      dockerfile: ./Dockerfile
+      context: ./nginx/
+    environment:
+      - PROJECT_DIR=${PROJECT_DIR}
+    container_name: console_nginx
+    image: console_nginx
+    volumes:
+      - static_console:$PROJECT_DIR/static
+      - media_console:$PROJECT_DIR/media
+    depends_on:
+      - console
+    ports:
+      - "80:80"
 
   postgres:
     container_name: postgres_container_console

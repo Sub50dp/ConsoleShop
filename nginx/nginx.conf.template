@@ -1,0 +1,22 @@
+upstream console {
+    server console:8000;
+}
+
+server {
+
+    listen 80;
+
+
+    location / {
+        include proxy_params;
+        proxy_pass http://console;
+    }
+
+    location /static/ {
+        alias /$PROJECT_DIR/static/;
+    }
+
+    location /media/ {
+        alias /$PROJECT_DIR/media/;
+    }
+}
