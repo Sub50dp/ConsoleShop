@@ -63,3 +63,5 @@ class UserDeleteApiView(APIView):
         message = "Category deleted successfully"
         status_code = status.HTTP_200_OK
         return Response({"message": message}, status=status_code)
+
+
