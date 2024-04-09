@@ -1,6 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.utils import timezone
 from slugify import slugify
+
 
 from users.models import CustomUser
 
@@ -26,6 +29,9 @@ class Feature(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        unique_together = ('name', 'value')
 
 
 class Product(models.Model):
@@ -74,3 +80,11 @@ class ProductRating(models.Model):
 
     def __str__(self):
         return f"{self.rating}"
+
+
+@receiver(post_save, sender=Product)
+@receiver(post_delete, sender=Product)
+def update_category_product_count(sender, instance, **kwargs):
+    category = instance.category
+    category.count_products = Product.objects.filter(category=category).count()
+    category.save()

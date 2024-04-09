@@ -10,13 +10,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['name', 'image', 'count_products']
+        fields = ['name', 'image', 'count_products', 'id']
 
 
 class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
-        fields = ['name', 'value']
+        fields = ['name', 'value', 'id']
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -27,4 +27,4 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['name', 'image', 'category', 'features', 'price', 'count', 'description',
-                  'available', 'brand', 'conditions', 'year_released']
+                  'available', 'brand', 'conditions', 'year_released', 'id']
