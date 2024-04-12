@@ -47,20 +47,20 @@ class ListCategoryAPIView(ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ShowCategoryAPIView(ListAPIView):
-    serializer_class = ProductSerializer
+# class ShowCategoryAPIView(ListAPIView):
+#     serializer_class = ProductSerializer
+#
+#     def get_queryset(self):
+#         category_slug = self.kwargs['cat_slug']
+#         return Product.objects.filter(category__slug=category_slug, available=True).order_by('name')
+#
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def get_queryset(self):
-        category_slug = self.kwargs['cat_slug']
-        return Product.objects.filter(category__slug=category_slug, available=True).order_by('name')
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class CategoryDeleteApiView(APIView):
+class DeleteCategoryApiView(APIView):
 
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]
     http_method_names = ["delete"]
@@ -73,7 +73,7 @@ class CategoryDeleteApiView(APIView):
         return Response({"message": message}, status=status_code)
 
 
-class CategoryEditApiView(mixins.UpdateModelMixin, GenericAPIView):
+class EditCategoryApiView(mixins.UpdateModelMixin, GenericAPIView):
 
     parser_classes = [MultiPartParser]
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]

@@ -43,7 +43,7 @@ class ListFeatureAPIView(ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class FeatureDeleteApiView(APIView):
+class DeleteFeatureApiView(APIView):
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]
     http_method_names = ["delete"]
 

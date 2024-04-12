@@ -1,14 +1,17 @@
 from django.db import IntegrityError
-from rest_framework import status, mixins
-from rest_framework.exceptions import ValidationError, ParseError
-from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404, GenericAPIView
+from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status, mixins, filters
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404, GenericAPIView, RetrieveAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from shop.filters import ProductFilter
 from shop.models import Category, Product, Feature
-from shop.serializers import CreateProductSerializer
+from shop.serializers import CreateProductSerializer, ProductSerializer
 from utils.permissions import StuffOrAdminPermission
 
 
@@ -48,3 +51,49 @@ class CreateProductAPIView(CreateAPIView):
             status_code = status.HTTP_201_CREATED
 
         return Response({"message": message}, status=status_code)
+
+
+class DeleteProductAPIView(APIView):
+
+    permission_classes = [IsAuthenticated, StuffOrAdminPermission]
+    http_method_names = ["delete"]
+
+    def delete(self, request, prod_slug, *args, **kwargs):
+        product = get_object_or_404(Product, slug=prod_slug)
+        product.delete()
+        message = "Product deleted successfully"
+        status_code = status.HTTP_200_OK
+        return Response({"message": message}, status=status_code)
+
+
+class ListProductAPIView(ListAPIView):
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    search_fields = ["name", "category__name", "brand"]
+    ordering_fields = "__all__"
+    filterset_class = ProductFilter
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if 'cat_slug' in self.kwargs:
+            category_slug = self.kwargs['cat_slug']
+            queryset = queryset.filter(category__slug=category_slug)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DetailProductAPIView(RetrieveAPIView):
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+        except Http404:
+            return Response({"message": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
