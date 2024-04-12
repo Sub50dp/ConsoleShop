@@ -26,6 +26,7 @@ class ProductAdmin(admin.ModelAdmin):
     fields = ['name', 'slug', 'category', 'image', 'show_photo', 'price', 'count', 'description', 'available', 'brand',
               'conditions', 'year_released', 'features', 'get_average_rating']
     readonly_fields = ['show_photo', 'get_average_rating']
+    filter_horizontal = ('features',)
 
     @admin.display(description='Average Rating')
     def get_average_rating(self, obj):

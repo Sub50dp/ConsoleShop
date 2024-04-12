@@ -51,8 +51,8 @@ class ShowCategoryAPIView(ListAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        category_id = self.kwargs['pk']
-        return Product.objects.filter(category_id=category_id, available=True).order_by('name')
+        category_slug = self.kwargs['cat_slug']
+        return Product.objects.filter(category__slug=category_slug, available=True).order_by('name')
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -65,8 +65,8 @@ class CategoryDeleteApiView(APIView):
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]
     http_method_names = ["delete"]
 
-    def delete(self, request, pk, *args, **kwargs):
-        category = get_object_or_404(Category, pk=pk)
+    def delete(self, request, cat_slug, *args, **kwargs):
+        category = get_object_or_404(Category, slug=cat_slug)
         category.delete()
         message = "Category deleted successfully"
         status_code = status.HTTP_200_OK
@@ -79,9 +79,9 @@ class CategoryEditApiView(mixins.UpdateModelMixin, GenericAPIView):
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]
     serializer_class = CategorySerializer
 
-    def put(self, request, pk, *args, **kwargs):
+    def put(self, request, cat_slug, *args, **kwargs):
         partial = True
-        category = get_object_or_404(Category, pk=pk)
+        category = get_object_or_404(Category, slug=cat_slug)
         serializer = self.get_serializer(category, data=request.data, partial=partial)
         try:
             serializer.is_valid(raise_exception=True)
