@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shop.models import Category, Product
-from shop.serializers import CategorySerializer, ProductSerializer
+from shop.models import Category
+from shop.serializers import CategorySerializer
 from utils.permissions import StuffOrAdminPermission
 
 
@@ -45,19 +45,6 @@ class ListCategoryAPIView(ListAPIView):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# class ShowCategoryAPIView(ListAPIView):
-#     serializer_class = ProductSerializer
-#
-#     def get_queryset(self):
-#         category_slug = self.kwargs['cat_slug']
-#         return Product.objects.filter(category__slug=category_slug, available=True).order_by('name')
-#
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.get_queryset()
-#         serializer = self.get_serializer(queryset, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class DeleteCategoryApiView(APIView):

@@ -16,4 +16,5 @@ urlpatterns = [
     path('product/delete/<slug:prod_slug>/', views.DeleteProductAPIView.as_view(), name='delete_product'),
     path('product/list/', views.ListProductAPIView.as_view(), name='list_product'),
     path('product/detail/<int:pk>/', views.DetailProductAPIView.as_view(), name='detail_product'),
+    path('product/update/<slug:prod_slug>/', views.EditProductApiView.as_view(), name='update_product'),
 ]

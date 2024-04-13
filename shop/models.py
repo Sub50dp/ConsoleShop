@@ -18,8 +18,7 @@ class Category(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(str(self.name))
+        self.slug = slugify(str(self.name))
         super().save(*args, **kwargs)
 
 
@@ -55,8 +54,7 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(str(self.name))
+        self.slug = slugify(str(self.name))
         super().save(*args, **kwargs)
 
     @property

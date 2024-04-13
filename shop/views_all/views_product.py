@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from shop.filters import ProductFilter
 from shop.models import Category, Product, Feature
-from shop.serializers import CreateProductSerializer, ProductSerializer
+from shop.serializers import CreateProductSerializer, ProductSerializer, EditProductSerializer, FeatureSerializer
 from utils.permissions import StuffOrAdminPermission
 
 
@@ -97,3 +97,51 @@ class DetailProductAPIView(RetrieveAPIView):
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class EditProductApiView(GenericAPIView, mixins.UpdateModelMixin):
+
+    queryset = Product.objects.all()
+    parser_classes = [MultiPartParser, FormParser]
+    serializer_class = EditProductSerializer
+    permission_classes = [IsAuthenticated, StuffOrAdminPermission]
+
+    def put(self, request, prod_slug, *args, **kwargs):
+        if 'features_add' in request.data:
+            features_add = request.data['features_add'].split(',')
+            request.data._mutable = True
+            request.data.pop('features_add')
+            request.data._mutable = False
+        else:
+            features_add = None
+        if 'features_remove' in request.data:
+            features_remove = request.data['features_remove'].split(',')
+            request.data._mutable = True
+            request.data.pop('features_remove')
+            request.data._mutable = False
+        else:
+            features_remove = None
+
+        partial = True
+        product = get_object_or_404(Product, slug=prod_slug)
+        serializer = self.get_serializer(product, data=request.data, partial=partial)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
+            message = f"{field}: {message}"
+            status_code = status.HTTP_400_BAD_REQUEST
+        else:
+            if features_add:
+                for feature_id in features_add:
+                    feature = get_object_or_404(Feature, id=feature_id)
+                    product.features.add(feature)
+            if features_remove:
+                for feature_id in features_remove:
+                    feature = get_object_or_404(Feature, id=feature_id)
+                    product.features.remove(feature)
+            serializer.save()
+            message = "Product updated successfully"
+            status_code = status.HTTP_200_OK
+
+        return Response({"message": message}, status=status_code)

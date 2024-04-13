@@ -42,3 +42,18 @@ class CreateProductSerializer(serializers.ModelSerializer):
                   'available', 'brand', 'conditions', 'year_released']
 
 
+class EditProductSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True, required=False)
+    features_add = serializers.ListField(child=serializers.IntegerField(), required=False)
+    features_remove = serializers.ListField(child=serializers.IntegerField(), required=False)
+
+    class Meta:
+        model = Product
+        fields = ['name', 'image', 'category', 'features_add', 'features_remove', 'price', 'count', 'description',
+                  'available', 'brand', 'conditions', 'year_released']
+        extra_kwargs = {
+            'name': {'required': False},
+            'category': {'required': False},
+            'price': {'required': False},
+            'year_released': {'required': False},
+        }
