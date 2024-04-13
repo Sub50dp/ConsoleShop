@@ -1,7 +1,4 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.generic import TemplateView, View
-
-class MyView(View):
-    def get(self, request, *args, **kwargs):
-        return HttpResponse("Hello, World!")
+from .views_all.views_category import *
+from .views_all.views_feature import *
+from .views_all.views_product import *
+from .views_all.views_rating_review import *

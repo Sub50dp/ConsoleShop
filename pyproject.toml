@@ -16,6 +16,12 @@ django-phonenumber-field = {version = "^7.3.0", extras = ["phonenumbers"]}
 django-allauth = "^0.61.1"
 django-rest-passwordreset = "^1.4.0"
 ruff = "^0.3.4"
+python-slugify = "^8.0.4"
+pillow = "^10.3.0"
+gunicorn = "^21.2.0"
+itsdangerous = "^2.1.2"
+django-cors-headers = "^4.3.1"
+django-filter = "^24.2"
 
 
 [build-system]
