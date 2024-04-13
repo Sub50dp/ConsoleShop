@@ -58,8 +58,8 @@ class DeleteProductAPIView(APIView):
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]
     http_method_names = ["delete"]
 
-    def delete(self, request, prod_slug, *args, **kwargs):
-        product = get_object_or_404(Product, slug=prod_slug)
+    def delete(self, request, pk, *args, **kwargs):
+        product = get_object_or_404(Product, id=pk)
         product.delete()
         message = "Product deleted successfully"
         status_code = status.HTTP_200_OK
@@ -106,7 +106,7 @@ class EditProductApiView(GenericAPIView, mixins.UpdateModelMixin):
     serializer_class = EditProductSerializer
     permission_classes = [IsAuthenticated, StuffOrAdminPermission]
 
-    def put(self, request, prod_slug, *args, **kwargs):
+    def put(self, request, pk, *args, **kwargs):
         if 'features_add' in request.data:
             features_add = request.data['features_add'].split(',')
             request.data._mutable = True
@@ -123,7 +123,7 @@ class EditProductApiView(GenericAPIView, mixins.UpdateModelMixin):
             features_remove = None
 
         partial = True
-        product = get_object_or_404(Product, slug=prod_slug)
+        product = get_object_or_404(Product, id=pk)
         serializer = self.get_serializer(product, data=request.data, partial=partial)
         try:
             serializer.is_valid(raise_exception=True)
