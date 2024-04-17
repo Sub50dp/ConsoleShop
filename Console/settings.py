@@ -47,10 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    'shop',
     'rest_framework',
     'drf_yasg',
+    "corsheaders",
     'users',
+    'shop',
 
     'allauth',
     'allauth.account',
@@ -189,3 +190,6 @@ EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='FViRMhHKmCef7HzI')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
