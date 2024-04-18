@@ -17,19 +17,12 @@ services:
       - .:$PROJECT_DIR
       - static_console:$PROJECT_DIR/static
       - media_console:$PROJECT_DIR/media
-#    command: >
-#      sh -c "cd $PROJECT_DIR &&
-#             python manage.py collectstatic --noinput &&
-#             python manage.py makemigrations &&
-#             python manage.py migrate &&
-#             python manage.py runserver 0.0.0.0:8000
-#             "
     command:
       sh -c "cd $PROJECT_DIR &&
              python manage.py collectstatic --noinput &&
              python manage.py makemigrations &&
              python manage.py migrate &&
-             python manage.py shell -c 'from django.contrib.auth import get_user_model; CustomUser = get_user_model(); CustomUser.objects.create_superuser(\"admin\", \"admin@i.ua\", \"admin\") if not CustomUser.objects.filter(username=\"admin\").exists() else None' &&
+             python manage.py shell -c \"from django.contrib.auth import get_user_model; CustomUser = get_user_model(); CustomUser.objects.create_superuser('admin', 'admin@i.ua', 'admin') if not CustomUser.objects.filter(username='admin@i.ua').exists() else None\" &&
              python manage.py runserver 0.0.0.0:8000
              "
     
