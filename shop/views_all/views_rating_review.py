@@ -1,7 +1,5 @@
 from django.db import IntegrityError
-from django.http import Http404
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, mixins, filters
+from rest_framework import status, mixins
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404, GenericAPIView, RetrieveAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -9,11 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shop.filters import ProductFilter
-from shop.models import Category, Product, Feature, ProductRating
-from shop.serializers import CreateProductSerializer, ProductSerializer, EditProductSerializer, FeatureSerializer, \
-    CreateRatingSerializer, EditRatingSerializer
-from utils.permissions import StuffOrAdminPermission, OwnOrAdminPermission, CustomUnauthorizedException
+from shop.models import Product, ProductRating
+from shop.serializers import CreateRatingSerializer, EditRatingSerializer
+from utils.permissions import CustomUnauthorizedException
 
 
 class CreateRatingReviewSerializer(CreateAPIView):
