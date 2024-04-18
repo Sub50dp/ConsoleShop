@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-from shop.models import Category, Feature, Product
+from shop.models import Category, Feature, Product, ProductRating
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -56,4 +56,22 @@ class EditProductSerializer(serializers.ModelSerializer):
             'category': {'required': False},
             'price': {'required': False},
             'year_released': {'required': False},
+        }
+
+
+class CreateRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductRating
+        fields = ['rating', 'text']
+        extra_kwargs = {
+            'text': {'required': False},}
+
+
+class EditRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductRating
+        fields = ['rating', 'text']
+        extra_kwargs = {
+            'text': {'required': False},
+            'rating': {'required': False},
         }

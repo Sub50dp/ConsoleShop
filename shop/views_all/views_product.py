@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shop.filters import ProductFilter
-from shop.models import Category, Product, Feature
-from shop.serializers import CreateProductSerializer, ProductSerializer, EditProductSerializer, FeatureSerializer
+from shop.models import Product, Feature
+from shop.serializers import CreateProductSerializer, ProductSerializer, EditProductSerializer
 from utils.permissions import StuffOrAdminPermission
 
 
@@ -33,14 +33,6 @@ class CreateProductAPIView(CreateAPIView):
 
         try:
             serializer.is_valid(raise_exception=True)
-        except ValidationError as e:
-            field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
-            message = f"{field}: {message}"
-            status_code = status.HTTP_400_BAD_REQUEST
-        except IntegrityError:
-            message = "This product is already in use"
-            status_code = status.HTTP_400_BAD_REQUEST
-        else:
             product = serializer.create(serializer.validated_data)
             if features_list:
                 for feature_id in features_list:
@@ -49,6 +41,13 @@ class CreateProductAPIView(CreateAPIView):
             product.save()
             message = "Product created successfully"
             status_code = status.HTTP_201_CREATED
+        except ValidationError as e:
+            field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
+            message = f"{field}: {message}"
+            status_code = status.HTTP_400_BAD_REQUEST
+        except IntegrityError:
+            message = "This product is already in use"
+            status_code = status.HTTP_400_BAD_REQUEST
 
         return Response({"message": message}, status=status_code)
 
@@ -127,11 +126,6 @@ class EditProductApiView(GenericAPIView, mixins.UpdateModelMixin):
         serializer = self.get_serializer(product, data=request.data, partial=partial)
         try:
             serializer.is_valid(raise_exception=True)
-        except ValidationError as e:
-            field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
-            message = f"{field}: {message}"
-            status_code = status.HTTP_400_BAD_REQUEST
-        else:
             if features_add:
                 for feature_id in features_add:
                     feature = get_object_or_404(Feature, id=feature_id)
@@ -143,5 +137,12 @@ class EditProductApiView(GenericAPIView, mixins.UpdateModelMixin):
             serializer.save()
             message = "Product updated successfully"
             status_code = status.HTTP_200_OK
+        except ValidationError as e:
+            field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
+            message = f"{field}: {message}"
+            status_code = status.HTTP_400_BAD_REQUEST
+        except IntegrityError:
+            message = "This product is already in use"
+            status_code = status.HTTP_400_BAD_REQUEST
 
         return Response({"message": message}, status=status_code)
