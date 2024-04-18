@@ -22,6 +22,9 @@ class CreateCategoryAPIView(CreateAPIView):
 
         try:
             serializer.is_valid(raise_exception=True)
+            serializer.save()
+            message = "Category created successfully"
+            status_code = status.HTTP_201_CREATED
         except ValidationError as e:
             field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
             message = f"{field}: {message}"
@@ -29,10 +32,6 @@ class CreateCategoryAPIView(CreateAPIView):
         except IntegrityError:
             message = "This category is already in use"
             status_code = status.HTTP_400_BAD_REQUEST
-        else:
-            serializer.save()
-            message = "Category created successfully"
-            status_code = status.HTTP_201_CREATED
 
         return Response({"message": message}, status=status_code)
 
@@ -72,12 +71,15 @@ class EditCategoryApiView(mixins.UpdateModelMixin, GenericAPIView):
         serializer = self.get_serializer(category, data=request.data, partial=partial)
         try:
             serializer.is_valid(raise_exception=True)
+            serializer.save()
+            message = "Category updated successfully"
+            status_code = status.HTTP_200_OK
         except ValidationError as e:
             field, message = (list(e.detail.keys())[0], list(e.detail.values())[0][0])
             message = f"{field}: {message}"
             status_code = status.HTTP_400_BAD_REQUEST
-        else:
-            serializer.save()
-            message = "Category updated successfully"
-            status_code = status.HTTP_200_OK
+        except IntegrityError:
+            message = "This category is already in use"
+            status_code = status.HTTP_400_BAD_REQUEST
+
         return Response({"message": message}, status=status_code)

@@ -17,4 +17,8 @@ urlpatterns = [
     path('product/list/', views.ListProductAPIView.as_view(), name='list_product'),
     path('product/<int:pk>/', views.DetailProductAPIView.as_view(), name='detail_product'),
     path('product/update/<int:pk>/', views.EditProductApiView.as_view(), name='update_product'),
+    path('rating/create/<int:product_id>/', views.CreateRatingReviewSerializer.as_view(), name='create_rating'),
+    path('rating/delete/<int:pk>/', views.DeleteRatingReviewAPIView.as_view(), name='delete_rating'),
+    path('rating/list/<int:product_id>/', views.ListRatingReviewAPIView.as_view(), name='list_rating'),
+    path('rating/update/<int:pk>/', views.EditRatingReviewAPIView.as_view(), name='update_rating'),
 ]
