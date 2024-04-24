@@ -2,14 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-
-class LowercaseEmailField(models.EmailField):
-    """
-    A custom EmailField that converts email addresses to lowercase.
-    """
-
-    def get_prep_value(self, value):
-        return value.lower()
+from utils.utils import LowercaseEmailField
 
 
 class CustomUser(AbstractUser):
