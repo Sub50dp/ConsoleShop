@@ -28,6 +28,7 @@ urlpatterns = [
     path(f"{prefix}/users/", include("users.urls")),
     path('accounts/', include('allauth.urls')),
     path(f"{prefix}/shop/", include("shop.urls")),
+    path(f"{prefix}/contact/", include("contact.urls")),
     *doc_urls,
 ]
 
