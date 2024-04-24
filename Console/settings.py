@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'users',
     'shop',
+    'contact',
 
     'allauth',
     'allauth.account',
