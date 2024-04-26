@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework.views import APIView
 
+from cart.models import Cart
 from users.serializers import (UserSerializer, LoginSerializer, ChangePasswordSerializer,
                                ResetPasswordTokenSerializer, UserEditSerializer)
 from users.swagger_schemas import delete_user_response_schema
@@ -28,7 +29,6 @@ class CreateUserApiView(CreateAPIView):
     def create(self, request, *args, **kwargs):
 
         serializer = self.get_serializer(data=request.data)
-
         try:
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
@@ -40,11 +40,14 @@ class CreateUserApiView(CreateAPIView):
             status_code = status.HTTP_400_BAD_REQUEST
         else:
             validated_data = serializer.validated_data
+            session_key = request.session.session_key
             password = validated_data.get("password")
             hashed_password = make_password(password)
             validated_data["password"] = hashed_password
             validated_data["is_active"] = False
             user = serializer.save()
+            if session_key:
+                Cart.objects.filter(session_key=session_key).update(user=user, session_key=None)
 
             message = "User created successfully"
             status_code = status.HTTP_201_CREATED
@@ -101,7 +104,7 @@ class UserLoginApiView(CreateAPIView):
             return Response({"message": message}, status=status_code)
 
         data = serializer.validated_data
-
+        session_key = request.session.session_key
         try:
             user = authenticate(request, username=data["email"], password=data["password"])
         except Exception:
@@ -110,6 +113,8 @@ class UserLoginApiView(CreateAPIView):
         else:
             if user is not None:
                 login(request, user)
+                if session_key and session_key != request.session.session_key:
+                    Cart.objects.filter(session_key=session_key).update(user=user, session_key=None)
                 message = "Login successful"
                 status_code = status.HTTP_200_OK
             else:

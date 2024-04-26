@@ -11,13 +11,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['name', 'image', 'count_products']
+        fields = ['id', 'name', 'image', 'count_products']
 
 
 class FeatureSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Feature
-        fields = ['name', 'value']
+        fields = ['id', 'name', 'value']
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -29,7 +30,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['name', 'slug', 'image', 'category', 'features', 'price', 'count', 'description',
+        fields = ['id', 'name', 'slug', 'image', 'category', 'features', 'price', 'count', 'description',
                   'available', 'brand', 'conditions', 'year_released', 'rating']
 
 
@@ -62,7 +63,7 @@ class EditProductSerializer(serializers.ModelSerializer):
 class CreateRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRating
-        fields = ['rating', 'text']
+        fields = ['id', 'rating', 'text']
         extra_kwargs = {
             'text': {'required': False},}
 
