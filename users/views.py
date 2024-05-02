@@ -14,6 +14,7 @@ from django.db import IntegrityError
 from rest_framework.views import APIView
 
 from cart.models import Cart
+from order.models import Order
 from users.serializers import (UserSerializer, LoginSerializer, ChangePasswordSerializer,
                                ResetPasswordTokenSerializer, UserEditSerializer)
 from users.swagger_schemas import delete_user_response_schema
@@ -48,6 +49,11 @@ class CreateUserApiView(CreateAPIView):
             user = serializer.save()
             if session_key:
                 Cart.objects.filter(session_key=session_key).update(user=user, session_key=None)
+                order = Order.objects.filter(session_key=session_key).first()
+                if order:
+                    order.user = user
+                    order.session_key = None
+                    order.save()
 
             message = "User created successfully"
             status_code = status.HTTP_201_CREATED
@@ -114,7 +120,15 @@ class UserLoginApiView(CreateAPIView):
             if user is not None:
                 login(request, user)
                 if session_key and session_key != request.session.session_key:
+                    cart = Cart.objects.filter(user=user).first()
+                    if cart:
+                        cart.delete()
                     Cart.objects.filter(session_key=session_key).update(user=user, session_key=None)
+                    order = Order.objects.filter(session_key=session_key).first()
+                    if order:
+                        order.user = user
+                        order.session_key = None
+                        order.save()
                 message = "Login successful"
                 status_code = status.HTTP_200_OK
             else:

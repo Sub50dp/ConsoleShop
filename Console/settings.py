@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'shop',
     'contact',
     'cart',
+    'order',
 
     'allauth',
     'allauth.account',

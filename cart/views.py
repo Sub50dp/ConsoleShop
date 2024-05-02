@@ -19,9 +19,16 @@ class UserCartApiView(RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         cart = return_cart_for_user(request)
+        cart_serializer = CartSerializer(cart)
+        cart_data = cart_serializer.data
+
         queryset = queryset.filter(cart=cart)
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        cart_items_data = serializer.data
+
+        cart_items_data.insert(0, {"cart": cart_data})
+
+        return Response(cart_items_data, status=status.HTTP_200_OK)
 
 
 class ShowCartApiView(RetrieveAPIView):
@@ -34,9 +41,16 @@ class ShowCartApiView(RetrieveAPIView):
         cart = Cart.objects.filter(pk=kwargs['pk']).first()
         if not cart:
             return Response({"message": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        cart_serializer = CartSerializer(cart)
+        cart_data = cart_serializer.data
+
         queryset = queryset.filter(cart=cart)
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        cart_items_data = serializer.data
+
+        cart_items_data.insert(0, {"cart": cart_data})
+
+        return Response(cart_items_data, status=status.HTTP_200_OK)
 
 
 class ListCartApiView(ListAPIView):

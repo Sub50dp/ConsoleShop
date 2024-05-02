@@ -30,6 +30,7 @@ urlpatterns = [
     path(f"{prefix}/shop/", include("shop.urls")),
     path(f"{prefix}/contact/", include("contact.urls")),
     path(f"{prefix}/cart/", include("cart.urls")),
+    path(f"{prefix}/order/", include("order.urls")),
     *doc_urls,
 ]
 

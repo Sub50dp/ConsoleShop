@@ -6,6 +6,7 @@ from shop.serializers import ProductSerializer
 
 class CartSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
+
     class Meta:
         model = Cart
         fields = ['id', 'user', 'count_items', 'total_price', 'create_date', 'update_date']
