@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'users',
     'shop',
     'contact',
+    'cart',
+    'order',
 
     'allauth',
     'allauth.account',
@@ -69,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'Console.middleware.AssignSessionKeyMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
@@ -166,6 +169,8 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by email
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SITE_ID = 1
 
